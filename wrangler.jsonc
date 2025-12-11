@@ -1,0 +1,28 @@
+{
+  "name": "editable_website",
+  "compatibility_date": "2025-01-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "pages_build_output_dir": ".svelte-kit/cloudflare",
+  "vars": {
+    "ADMIN_PASSWORD": "12345"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ew_dev3",
+      "database_id": "4c3b32d2-2723-4798-a1d2-e59038977c3b"
+    }
+  ],
+
+  // --- R2 bucket binding for uploads ---
+  // The code will use platform.env.ASSETS (same name in all envs)
+  "r2_buckets": [
+    {
+      "binding": "R2_ASSETS",
+      // Production bucket name in R2
+      "bucket_name": "editable-website-assets",
+      // Preview/`wrangler pages dev` bucket
+      "preview_bucket_name": "editable-website-assets-dev"
+    }
+  ]
+}

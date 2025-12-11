@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  @apply text-gray-900;
+}
+
+.bounce {
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Prosemirror styles */
+
+.ProseMirror {
+  position: relative;
+}
+
+.ProseMirror {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  white-space: break-spaces;
+  -webkit-font-variant-ligatures: none;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0; /* the above doesn't seem to work in Edge */
+}
+
+.ProseMirror pre {
+  white-space: pre-wrap;
+}
+
+.ProseMirror li {
+  position: relative;
+}
+
+.ProseMirror-hideselection *::selection {
+  background: transparent;
+}
+.ProseMirror-hideselection *::-moz-selection {
+  background: transparent;
+}
+.ProseMirror-hideselection {
+  caret-color: transparent;
+}
+
+.ProseMirror-selectednode {
+  outline: 2px solid #8cf;
+}
+
+/* Make sure li selections wrap around markers */
+li.ProseMirror-selectednode {
+  outline: none;
+}
+
+li.ProseMirror-selectednode:after {
+  content: "";
+  position: absolute;
+  left: -32px;
+  right: -2px;
+  top: -2px;
+  bottom: -2px;
+  border: 2px solid #8cf;
+  pointer-events: none;
+}
+
+/* === Header visibility & readable content on light/dark === */
+
+/* 1) Make the header readable on both backgrounds */
+header,
+.site-header {
+  @apply bg-white/80 dark:bg-neutral-900/70 supports-[backdrop-filter]:backdrop-blur;
+}
+header a,
+header button,
+.site-header a,
+.site-header button {
+  @apply text-neutral-900 dark:text-white !important;
+}
+
+/* 2) Ensure text inside white sections/cards stays dark enough */
+.bg-white,
+.prose,
+.prose :where(p, li, h1, h2, h3, h4, h5, h6, strong, em) {
+  @apply text-neutral-900;
+}
+.dark .bg-white,
+.dark .prose,
+.dark .prose :where(p, li, h1, h2, h3, h4, h5, h6, strong, em) {
+  @apply text-neutral-100;
+}
+
+/* 3) Optional: stronger divider color for light/dark */
+hr,
+.border-gray-100 {
+  @apply border-neutral-200/70 dark:border-white/10;
+}
