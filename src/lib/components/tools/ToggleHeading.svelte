@@ -6,13 +6,19 @@
   export let editorView;
   export let editorState;
 
-  $: schema = editorState.schema;
+  $: schema = editorState?.schema;
   $: disabled =
-    !setBlockType(schema.nodes.heading)(editorState) &&
-    !setBlockType(schema.nodes.paragraph)(editorState);
-  $: active = blockTypeActive(schema.nodes.heading, { level: 1 })(editorState);
+    !editorState ||
+    !schema ||
+    (!setBlockType(schema.nodes.heading)(editorState) &&
+      !setBlockType(schema.nodes.paragraph)(editorState));
+
+  $: active = editorState
+    ? blockTypeActive(schema.nodes.heading, { level: 1 })(editorState)
+    : false;
 
   function handleClick() {
+    if (disabled || !editorView) return;
     if (active) {
       setBlockType(schema.nodes.paragraph)(editorState, editorView.dispatch);
     } else {

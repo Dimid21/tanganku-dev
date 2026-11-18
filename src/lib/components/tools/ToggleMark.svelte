@@ -7,14 +7,15 @@
   export let editorState;
   export let type;
 
-  $: schema = editorState.schema;
-  $: markType = schema.marks[type];
+  $: schema = editorState?.schema;
+  $: markType = schema?.marks?.[type];
 
-  $: command = toggleMark(markType);
-  $: disabled = !markType || !command(editorState, null);
-  $: active = markActive(markType)(editorState);
+  $: command = markType ? toggleMark(markType) : null;
+  $: disabled = !editorState || !markType || !command || !command(editorState, null);
+  $: active = editorState && markType ? markActive(markType)(editorState) : false;
 
   function handleClick() {
+    if (disabled || !editorView) return;
     command(editorState, editorView.dispatch, editorView);
     editorView.focus();
   }

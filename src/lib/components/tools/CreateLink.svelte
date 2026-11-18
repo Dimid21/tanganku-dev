@@ -6,10 +6,11 @@
   export let editorView;
   export let editorState;
 
-  $: schema = editorState.schema;
-  $: disabled = !createLink(editorState, null, editorView);
+  $: schema = editorState?.schema;
+  $: disabled = !editorState || !schema || !createLink(editorState, null, editorView);
 
   function handleClick() {
+    if (disabled || !editorView) return;
     let url = prompt('Enter link URL', 'https://example.com');
     if (url) {
       toggleMark(schema.marks.link, { href: url })(editorState, editorView.dispatch);

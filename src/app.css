@@ -1,3 +1,7 @@
+/* =========================================================
+   BASE / EXISTING APP.CSS (DO NOT TOUCH)
+   ========================================================= */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -38,7 +42,7 @@ html {
   white-space: break-spaces;
   -webkit-font-variant-ligatures: none;
   font-variant-ligatures: none;
-  font-feature-settings: "liga" 0; /* the above doesn't seem to work in Edge */
+  font-feature-settings: "liga" 0;
 }
 
 .ProseMirror pre {
@@ -63,7 +67,6 @@ html {
   outline: 2px solid #8cf;
 }
 
-/* Make sure li selections wrap around markers */
 li.ProseMirror-selectednode {
   outline: none;
 }
@@ -79,9 +82,8 @@ li.ProseMirror-selectednode:after {
   pointer-events: none;
 }
 
-/* === Header visibility & readable content on light/dark === */
+/* Header readability (light/dark) */
 
-/* 1) Make the header readable on both backgrounds */
 header,
 .site-header {
   @apply bg-white/80 dark:bg-neutral-900/70 supports-[backdrop-filter]:backdrop-blur;
@@ -93,7 +95,6 @@ header button,
   @apply text-neutral-900 dark:text-white !important;
 }
 
-/* 2) Ensure text inside white sections/cards stays dark enough */
 .bg-white,
 .prose,
 .prose :where(p, li, h1, h2, h3, h4, h5, h6, strong, em) {
@@ -105,8 +106,690 @@ header button,
   @apply text-neutral-100;
 }
 
-/* 3) Optional: stronger divider color for light/dark */
 hr,
 .border-gray-100 {
   @apply border-neutral-200/70 dark:border-white/10;
+}
+
+/* =========================================================
+   TANGANKU v2.3 LEGACY STYLES
+   (HTML → SVELTE MIGRATION, NO REFACTOR YET)
+   ========================================================= */
+
+:root {
+  --panel-bg: linear-gradient(180deg, #0b2130 0%, #071026 100%);
+  --panel-flat: #071026;
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --muted: rgba(255, 255, 255, 0.82);
+  --accent-a: #7c3aed;
+  --accent-b: #06b6d4;
+
+  --left-width: 50%;
+  --right-width: 50%;
+  --overlay-width: 86%;
+  --overlay-alpha: 0.72;
+
+  --img-scale: 0.6;
+  --img-position: left;
+
+  --tng-blue-1: #2f80ed;
+  --tng-blue-2: #56ccf2;
+  --tng-blue-3: #2d9cdb;
+  --tng-text-light: rgba(255, 255, 255, 0.92);
+  --tng-text-muted: rgba(255, 255, 255, 0.65);
+  --tng-glass-bg: rgba(255, 255, 255, 0.06);
+  --tng-glass-bg-strong: rgba(255, 255, 255, 0.1);
+  --tng-glass-border: rgba(255, 255, 255, 0.18);
+  --tng-ease: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* Base glass color (HTML v2.3 parity) */
+  --glass-bg: rgba(10, 26, 48, 0.92);
+
+  /* Border */
+  --glass-border-soft: rgba(255, 255, 255, 0.14);
+  --glass-border-strong: rgba(255, 255, 255, 0.22);
+
+  /* Shadow */
+  --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 22px 60px rgba(2, 6, 23, 0.85);
+
+  /* Blur */
+  --glass-blur: blur(14px) saturate(115%);
+}
+
+.split {
+  display: grid;
+  grid-template-columns: var(--left-width) var(--right-width);
+  min-height: 100vh;
+}
+
+.left .overlay {
+  position: sticky;
+  top: 34px;
+  margin-left: 60px;
+  margin-top: 18px;
+  width: var(--overlay-width);
+  max-width: 980px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* === LOGO GLASS === */
+
+.tng-logo-glass {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  position: relative;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px) saturate(160%);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+  animation: iconFloat 4s ease-in-out infinite;
+}
+
+.tng-logo-glass img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.92;
+}
+
+.tng-logo-glass::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #56ccf2, #2f80ed, #8eafff);
+  opacity: 0.35;
+  filter: blur(18px);
+  z-index: -1;
+  animation: iconGlow 3s ease-in-out infinite;
+}
+
+/* === TEXT === */
+
+.headline {
+  font-size: 54px;
+  font-weight: 800;
+  line-height: 1.02;
+}
+
+.lede {
+  color: var(--muted);
+  max-width: 72ch;
+}
+
+.tng-title-gradient {
+  background: linear-gradient(90deg, #56ccf2, #2f80ed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* === CTA === */
+
+.cta-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 0;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+  color: #fff;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+/* === PREMIUM CTA === */
+
+.tng-btn-contrast {
+  background: linear-gradient(90deg, #2f80ed, #56ccf2, #2d9cdb);
+  color: #fff;
+  border-radius: 14px;
+  padding: 14px 26px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 18px rgba(86, 204, 242, 0.25);
+}
+
+.tng-btn-contrast::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transform: skewX(-20deg);
+  animation: shimmerMove 2.8s infinite;
+}
+
+/* =====================================================
+   GLASS BASE — REUSABLE
+   ===================================================== */
+
+.tng-glass {
+  position: relative;
+
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-soft);
+  border-radius: 18px;
+
+  box-shadow: var(--glass-shadow);
+
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+/* === ANIMATIONS === */
+
+@keyframes iconFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes iconGlow {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+@keyframes shimmerMove {
+  0% {
+    left: -150%;
+  }
+  100% {
+    left: 150%;
+  }
+}
+
+/* === RESPONSIVE === */
+
+@media (max-width: 980px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+  .left .overlay {
+    margin-left: 18px;
+    width: calc(100% - 36px);
+  }
+  .headline {
+    font-size: 34px;
+  }
+}
+
+/* ================================
+   TANGANKU SCOPE FIX
+   ================================ */
+
+.tng-scope *,
+.tng-scope *::before,
+.tng-scope *::after {
+  box-sizing: border-box;
+}
+
+/* override tailwind prose & bg */
+.tng-scope .bg-white {
+  background: transparent !important;
+}
+
+.tng-scope .prose {
+  color: var(--muted);
+  max-width: none;
+}
+
+.tng-scope .prose p,
+.tng-scope .prose li,
+.tng-scope .prose strong {
+  color: var(--muted);
+}
+
+/* ensure split fills viewport */
+.tng-scope .split {
+  min-height: 100vh;
+}
+
+/* =====================================
+   FINAL VISUAL MATCH FIX (v2.3 parity)
+   ===================================== */
+
+.tng-scope .right {
+  background: transparent;
+  min-height: 100vh;
+}
+
+/* preview panel tone */
+.tng-scope .panel {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 48px rgba(2, 6, 23, 0.6);
+}
+
+/* preview items */
+.tng-scope .preview-item {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tng-scope .tng-btn-contrast {
+  box-shadow: 0 0 22px rgba(86, 204, 242, 0.35);
+}
+
+.tng-scope .headline {
+  font-size: 54px;
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+.tng-scope .lede {
+  max-width: 72ch;
+  color: var(--muted);
+}
+
+/* =====================================================
+   TANGANKU v2.3 — LEFT TYPOGRAPHY (PIXEL PARITY)
+   ===================================================== */
+
+.tng-scope {
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+}
+
+/* =====================================================
+   HERO TITLE — HTML 1:1 PARITY
+   ===================================================== */
+
+.tng-scope .headline {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 54px; /* HTML EXACT */
+  font-weight: 800;
+  margin: 6px 0;
+  line-height: 1.02; /* HTML EXACT */
+  letter-spacing: normal; /* HTML default */
+}
+
+/* headline gradient — HTML EXACT */
+.tng-scope .tng-title-gradient {
+  background: linear-gradient(90deg, #56ccf2, #2f80ed);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+
+  animation: titleShine 4s ease-in-out infinite;
+}
+
+.plaintext-editing {
+  -webkit-text-fill-color: initial !important;
+  caret-color: #ffffff; /* atau hitam, sesuai theme */
+}
+
+/* HTML EXACT KEYFRAMES */
+@keyframes titleShine {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.25);
+  }
+}
+
+/* ---------- LEDE ---------- */
+
+.tng-scope .lede {
+  max-width: 70ch;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.85);
+
+  /* RESET semua margin default */
+  margin: 0;
+}
+
+/* ---------- CTA ---------- */
+
+.tng-scope .cta-row {
+  margin-top: 1px; /* NORMAL value lagi */
+  margin-bottom: 34px;
+}
+
+.tng-scope .btn {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 14px 22px; /* EXACT */
+  border-radius: 14px; /* EXACT */
+}
+
+.tng-scope .btn-outline {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: transparent;
+  color: #fff;
+}
+
+.tng-scope .overlay {
+  display: flex;
+  flex-direction: column;
+
+  /* INI YANG SAMAIN DENGAN HTML */
+  gap: 18px;
+}
+
+/* =====================================================
+   WHY EDIT
+   ===================================================== */
+
+.tng-scope .why-card {
+  padding: 28px 30px;
+}
+
+/* TEXT */
+.tng-scope .why-card p,
+.tng-scope .why-card li {
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.tng-scope .why-card li {
+  margin-bottom: 6px;
+}
+
+/* VERY SOFT GLASS SHEEN */
+.tng-scope .why-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.1), transparent 45%);
+
+  opacity: 0.25;
+}
+
+/* CONTENT */
+.tng-scope .why-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* TEXT */
+.tng-scope .why-card p,
+.tng-scope .why-card li {
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.tng-scope .why-card li {
+  margin-bottom: 6px;
+}
+
+/* HOVER — SUBTLE & READABLE */
+.tng-scope .why-card:hover {
+  border-color: rgba(255, 255, 255, 0.26);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 26px 68px rgba(2, 6, 23, 0.9);
+}
+
+/* =====================================================
+   RIGHT COLUMN — NEUTRAL DARK (HTML MATCH)
+   ===================================================== */
+
+.tng-scope .right {
+  background: transparent;
+
+  padding: 32px 28px;
+  color: #fff;
+}
+
+/* =====================================================
+   PREVIEW PANEL
+   ===================================================== */
+
+.tng-scope .panel {
+  padding: 22px;
+  border-radius: 18px;
+  margin-bottom: 26px;
+
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  box-shadow:
+    0 32px 90px rgba(2, 6, 23, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* =====================================================
+   PANEL HEADER
+   ===================================================== */
+
+.tng-scope .panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.tng-scope .panel-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.tng-scope .panel-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 4px;
+}
+
+.tng-scope .panel-meta {
+  text-align: right;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.tng-scope .panel-date {
+  margin-bottom: 2px;
+}
+
+/* =====================================================
+   PREVIEW ITEMS
+   ===================================================== */
+
+.tng-scope .preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tng-scope .preview-item {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 14px;
+
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015));
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  box-shadow: 0 14px 40px rgba(2, 6, 23, 0.55);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.tng-scope .preview-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 54px rgba(2, 6, 23, 0.7);
+}
+
+.tng-scope .preview-icon {
+  font-size: 18px;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.tng-scope .preview-content strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.tng-scope .preview-content div {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 4px;
+}
+
+.tng-scope .preview-list {
+  margin-bottom: 20px;
+}
+
+/* =====================================================
+    OUTER OWNER CARD (hover bright)
+   ===================================================== */
+
+.tng-scope .owner-card {
+  margin-top: 28px;
+  padding: 14px;
+  border-radius: 20px;
+
+  background: linear-gradient(180deg, rgba(10, 28, 55, 0.55), rgba(6, 16, 32, 0.65));
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  box-shadow: 0 26px 60px rgba(2, 6, 23, 0.75);
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.tng-scope .owner-card:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+
+  box-shadow:
+    0 26px 60px rgba(2, 6, 23, 0.75),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+/* =====================================================
+   OWNER INNER
+   ===================================================== */
+
+.tng-scope .owner-inner {
+  padding: 28px 30px;
+}
+
+/* -----------------------------------------------------
+    TYPO & SPACING (AGAR TERBACA SEPERTI HTML)
+   ----------------------------------------------------- */
+
+.tng-scope .owner-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.tng-scope .owner-desc {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.88);
+  margin-bottom: 14px;
+}
+
+.tng-scope .owner-meta {
+  font-size: 13px;
+  line-height: 1.65;
+  margin-bottom: 16px;
+}
+
+.tng-scope .owner-meta li {
+  margin-bottom: 6px;
+}
+
+.tng-scope .owner-skills .skills-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.tng-scope .owner-skills li {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.tng-scope .owner-footer {
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.tng-scope {
+  min-height: 100vh;
+
+  background:
+    radial-gradient(1200px 600px at 15% 20%, rgba(20, 80, 140, 0.18), transparent 60%),
+    linear-gradient(180deg, #0b1d33 0%, #081426 45%, #060f1f 100%);
+
+  color: #e6edf6;
+}
+
+/* =====================================================
+   GLOBAL BACKGROUND — SINGLE SOURCE (FINAL)
+   ===================================================== */
+
+.tng-scope {
+  min-height: 100vh;
+  color: #e6edf6;
+
+  background:
+    radial-gradient(1200px 600px at 15% 20%, rgba(20, 80, 140, 0.18), transparent 60%),
+    linear-gradient(180deg, #0b1d33 0%, #081426 45%, #060f1f 100%);
+}
+
+.tng-scope .left,
+.tng-scope .right {
+  background: transparent !important;
 }

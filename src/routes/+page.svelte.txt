@@ -1,0 +1,269 @@
+<script>
+  import PlainText from '$lib/components/PlainText.svelte';
+  import RichText from '$lib/components/RichText.svelte';
+  import Modal from '$lib/components/Modal.svelte';
+  import PrimaryButton from '$lib/components/PrimaryButton.svelte';
+  import SecondaryButton from '$lib/components/SecondaryButton.svelte';
+  import LoginMenu from '$lib/components/LoginMenu.svelte';
+  // import Footer from '$lib/components/Footer.svelte';
+  import NotEditable from '$lib/components/NotEditable.svelte';
+  // import WebsiteHeader from '$lib/components/WebsiteHeader.svelte';
+  import { showEditMenu } from '$lib/stores-edit.js';
+  import { currentUser, isEditing } from '$lib/stores.js';
+  import { fetchJSON } from '$lib/util';
+  import EditorToolbar from '$lib/components/tools/EditorToolbar.svelte';
+  import FloatingEditButton from '$lib/components/FloatingEditButton.svelte';
+
+  export let data;
+
+  /* ===============================
+     LEFT COLUMN — v2.3 EXACT CONTENT
+     =============================== */
+
+  let heroTitle = 'Create pages you can edit directly in the browser';
+
+  let heroLede = `
+Tanganku-Site (demo) shows content that can be edited directly — similar to
+editable.website. Every element can be modified by users: text, images, layout,
+and components.
+`;
+
+  let whyEditHTML = `
+<p><strong>Why edit in-browser?</strong> Live editing removes the friction between idea and result — no separate CMS, instant visual feedback, and simple exports for production or demos.</p>
+
+<div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:10px">
+  <div style="flex:1;min-width:220px">
+    <div style="font-weight:700;margin-bottom:8px">Key Benefits</div>
+    <ul class="why-list">
+      <li>No CMS required — edit pages live</li>
+      <li>Immediate visual feedback</li>
+      <li>Component-based blocks for reuse</li>
+      <li>Fast export to clean HTML/CSS</li>
+    </ul>
+  </div>
+
+  <div style="flex:1;min-width:220px">
+    <div style="font-weight:700;margin-bottom:8px">
+      How it works — 3 quick steps
+    </div>
+    <ol style="margin-left:18px;color:var(--muted);line-height:1.6">
+      <li><strong>Activate</strong> — Click any editable element.</li>
+      <li><strong>Modify</strong> — Change text, images, colors or layout.</li>
+      <li><strong>Save & Export</strong> — Export HTML/CSS ready to deploy.</li>
+    </ol>
+  </div>
+</div>
+
+<p class="small" style="margin-top:12px;color:var(--muted)">
+This card combines the value proposition and a concise workflow so visitors
+immediately understand what Tanganku-Site offers and how to get started.
+</p>
+`;
+
+  function startEditPage() {
+    isEditing.set(true);
+    showEditMenu.set(false);
+  }
+
+  /* ===============================
+     EXISTING EDITABLE LOGIC (UNCHANGED)
+     =============================== */
+
+  $currentUser = data.currentUser;
+  let showUserMenu = false;
+
+  function toggleEdit() {
+    $isEditing = true;
+    showUserMenu = false;
+  }
+
+  async function savePage() {
+    try {
+      if ($currentUser) {
+        await fetchJSON('POST', '/api/save-page', {
+          pageId: 'home',
+          page: {}
+        });
+      }
+      $isEditing = false;
+    } catch (err) {
+      alert('Error saving page');
+    }
+  }
+
+  export let tag = 'div';
+  export let value = '';
+  export let editable = false;
+
+  let el;
+</script>
+
+<EditorToolbar />
+<FloatingEditButton />
+
+<svelte:element
+  this={tag}
+  bind:this={el}
+  class:plaintext-editing={editable}
+  contenteditable={editable}
+  on:input={() => (value = el.innerText)}
+>
+  {value}
+</svelte:element>
+
+{#if $showEditMenu && $currentUser}
+  <Modal on:close={() => showEditMenu.set(false)}>
+    <div class="w-full flex flex-col space-y-4 p-6 text-center">
+      <PrimaryButton on:click={startEditPage}>Edit page</PrimaryButton>
+
+      <LoginMenu />
+    </div>
+  </Modal>
+{/if}
+
+<svelte:head>
+  <title>Tanganku — Editable Website</title>
+</svelte:head>
+
+<!-- ===============================
+     SPLIT 50/50 — v2.3
+     =============================== -->
+
+<div class="tng-scope">
+  <div class="split">
+    <!-- LEFT -->
+    <div class="left">
+      <div class="overlay">
+        <div class="brand">
+          <div class="tng-logo-glass">
+            <img src="/images/profile.jpg" alt="Profile" />
+          </div>
+          <div>
+            <div style="font-weight:700">Tanganku</div>
+            <small style="display:block;color:var(--muted)">
+              Editable demo — build and modify your website directly in the browser
+            </small>
+          </div>
+        </div>
+
+        <PlainText
+          tag="h1"
+          class="headline tng-title-gradient"
+          bind:value={heroTitle}
+          editable={$isEditing}
+        />
+
+        <div class="lede">
+          {heroLede}
+        </div>
+
+        <div class="cta-row">
+          <button class="btn btn-primary tng-btn-contrast"> Start Editing </button>
+          <button class="btn btn-outline"> View Documentation </button>
+        </div>
+
+        <div class="why-card tng-glass">
+          <div class="title">Why edit directly — and how it works</div>
+          {@html whyEditHTML}
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <aside class="right">
+      <!-- PREVIEW PANEL -->
+      <div class="panel">
+        <!-- PANEL HEADER -->
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Preview Panel</div>
+            <div class="panel-sub">Hover the cards to see interactive effects</div>
+          </div>
+
+          <div class="panel-meta">
+            <div class="panel-date">11 Dec 2025</div>
+            <div class="panel-mode">Demo Mode</div>
+          </div>
+        </div>
+
+        <!-- PREVIEW ITEMS -->
+        <div class="preview-list">
+          <div class="preview-item">
+            <div class="preview-icon">✏️</div>
+            <div class="preview-content">
+              <strong>Editable Section</strong>
+              <div>
+                Edit text directly on this card. Add images, change colors, and save your changes.
+              </div>
+            </div>
+          </div>
+
+          <div class="preview-item">
+            <div class="preview-icon">🧩</div>
+            <div class="preview-content">
+              <strong>Blocks Library</strong>
+              <div>Choose from pre-built blocks: Hero, Features, Testimonials, and Footer.</div>
+            </div>
+          </div>
+
+          <div class="preview-item">
+            <div class="preview-icon">📤</div>
+            <div class="preview-content">
+              <strong>Export & Publish</strong>
+              <div>Save versions, export HTML/CSS, or publish your demo with a single click.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OWNER CARD -->
+      <div class="owner-card">
+        <!-- INNER CARD -->
+        <div class="owner-inner tng-glass">
+          <div class="owner-title">System Engineer · Developer · Automation Enthusiast</div>
+
+          <p class="owner-desc">
+            Hi, I'm Fikri — a developer passionate about creating elegant automation solutions. I
+            enjoy simplifying complex tasks through code and sharing tools that make daily workflows
+            more efficient.
+          </p>
+
+          <ul class="owner-meta">
+            <li>
+              <strong>Servers:</strong>
+              HPE ProLiant (ML, DL, BL Series), SimpliVity, VMware ESXi
+            </li>
+            <li>
+              <strong>Storage:</strong>
+              3PAR, Primera, StoreOnce, P9000, XP7, MSL, and MSA
+            </li>
+            <li>
+              <strong>Linux Stuff:</strong>
+              Container, Webserver, Mailserver, DNS servers, and cPanel (WHM)
+            </li>
+            <li>
+              <strong>Cloud:</strong>
+              AWS (Amazon Web Services)
+            </li>
+          </ul>
+
+          <div class="owner-skills">
+            <div class="skills-title">Additional Skills (Editable Website Focus)</div>
+            <ul>
+              <li>Editable Website Architecture</li>
+              <li>Live Frontend Editing</li>
+              <li>Component-Based Design</li>
+              <li>Frontend UI/UX Development</li>
+              <li>Performance-Focused Development</li>
+            </ul>
+          </div>
+
+          <p class="owner-footer">
+            I aim to build fast, modern, and user-friendly websites that anyone can edit directly
+            from the browser — without needing a CMS.
+          </p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>

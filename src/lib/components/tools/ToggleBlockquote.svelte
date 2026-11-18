@@ -5,10 +5,11 @@
   export let editorView;
   export let editorState;
 
-  $: schema = editorState.schema;
-  $: disabled = !wrapIn(schema.nodes.blockquote)(editorView.state);
+  $: schema = editorState?.schema;
+  $: disabled = !editorState || !schema || !wrapIn(schema.nodes.blockquote)(editorView.state);
 
   function handleClick() {
+    if (disabled || !editorView) return;
     wrapIn(schema.nodes.blockquote)(editorState, editorView.dispatch);
     editorView.focus();
   }

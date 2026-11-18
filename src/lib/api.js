@@ -28,12 +28,20 @@ export async function createArticle(platform, title, content, teaser, currentUse
   const existsResult = await db.prepare('SELECT * FROM articles WHERE slug = ?').bind(slug).all();
   if (existsResult.results.length > 0) slug = `${slug}-${nanoid()}`;
 
-  await db.prepare(`
+  await db
+    .prepare(
+      `
     INSERT INTO articles (slug, title, content, teaser, published_at)
     VALUES (?, ?, ?, ?, datetime('now'))
-  `).bind(slug, title, content, teaser).run();
+  `
+    )
+    .bind(slug, title, content, teaser)
+    .run();
 
-  const result = await db.prepare('SELECT slug, created_at FROM articles WHERE slug = ?').bind(slug).all();
+  const result = await db
+    .prepare('SELECT slug, created_at FROM articles WHERE slug = ?')
+    .bind(slug)
+    .all();
   return result.results[0] || null;
 }
 
@@ -44,13 +52,21 @@ export async function updateArticle(platform, slug, title, content, teaser, curr
   if (!currentUser) throw new Error('Not authorized');
   const db = getDB(platform);
 
-  await db.prepare(`
+  await db
+    .prepare(
+      `
     UPDATE articles
     SET title = ?, content = ?, teaser = ?, updated_at = datetime('now')
     WHERE slug = ?
-  `).bind(title, content, teaser, slug).run();
+  `
+    )
+    .bind(title, content, teaser, slug)
+    .run();
 
-  const result = await db.prepare('SELECT slug, updated_at FROM articles WHERE slug = ?').bind(slug).all();
+  const result = await db
+    .prepare('SELECT slug, updated_at FROM articles WHERE slug = ?')
+    .bind(slug)
+    .all();
   return result.results[0] || null;
 }
 
@@ -66,7 +82,10 @@ export async function authenticate(platform, password, sessionTimeout) {
 
   const sessionId = nanoid();
   await db.prepare('DELETE FROM sessions WHERE expires < ?').bind(new Date().toISOString()).run();
-  await db.prepare('INSERT INTO sessions (session_id, expires) VALUES (?, ?)').bind(sessionId, expires).run();
+  await db
+    .prepare('INSERT INTO sessions (session_id, expires) VALUES (?, ?)')
+    .bind(sessionId, expires)
+    .run();
 
   return { sessionId };
 }
@@ -178,9 +197,10 @@ export async function deleteArticle(platform, slug, currentUser) {
 export async function getCurrentUser(platform, session_id) {
   if (!session_id) return null;
   const db = getDB(platform);
-  const result = await db.prepare(
-    'SELECT session_id, expires FROM sessions WHERE session_id = ? AND expires > ?'
-  ).bind(session_id, new Date().toISOString()).all();
+  const result = await db
+    .prepare('SELECT session_id, expires FROM sessions WHERE session_id = ? AND expires > ?')
+    .bind(session_id, new Date().toISOString())
+    .all();
   const row = result.results[0];
   return row ? { name: 'Admin' } : null;
 }
@@ -192,20 +212,25 @@ export async function createOrUpdatePage(platform, page_id, page, currentUser) {
   if (!currentUser) throw new Error('Not authorized');
   const db = getDB(platform);
 
-  const pageExistsResult = await db.prepare('SELECT page_id FROM pages WHERE page_id = ?').bind(page_id).all();
+  const pageExistsResult = await db
+    .prepare('SELECT page_id FROM pages WHERE page_id = ?')
+    .bind(page_id)
+    .all();
   const pageExists = pageExistsResult.results[0];
   const jsonData = JSON.stringify(page);
   const now = new Date().toISOString();
 
   if (pageExists) {
-    const updateResult = await db.prepare(
-      'UPDATE pages SET data = ?, updated_at = ? WHERE page_id = ? RETURNING page_id'
-    ).bind(jsonData, now, page_id).all();
+    const updateResult = await db
+      .prepare('UPDATE pages SET data = ?, updated_at = ? WHERE page_id = ? RETURNING page_id')
+      .bind(jsonData, now, page_id)
+      .all();
     return updateResult.results[0] || null;
   } else {
-    const insertResult = await db.prepare(
-      'INSERT INTO pages (page_id, data, updated_at) VALUES (?, ?, ?) RETURNING page_id'
-    ).bind(page_id, jsonData, now).all();
+    const insertResult = await db
+      .prepare('INSERT INTO pages (page_id, data, updated_at) VALUES (?, ?, ?) RETURNING page_id')
+      .bind(page_id, jsonData, now)
+      .all();
     return insertResult.results[0] || null;
   }
 }
@@ -216,8 +241,19 @@ export async function createOrUpdatePage(platform, page_id, page, currentUser) {
 export async function getPage(platform, page_id) {
   const db = getDB(platform);
   const result = await db.prepare('SELECT data FROM pages WHERE page_id = ?').bind(page_id).all();
+
+  console.log('[getPage]', page_id, result.results?.[0]?.data);
+
   const row = result.results[0];
-  return row?.data ? JSON.parse(row.data) : null;
+
+  if (!row?.data) {
+    return null;
+  }
+
+  return {
+    id: page_id,
+    content: JSON.parse(row.data)
+  };
 }
 
 /**
@@ -225,18 +261,23 @@ export async function getPage(platform, page_id) {
  */
 export async function createOrUpdateCounter(platform, counter_id) {
   const db = getDB(platform);
-  const counterResult = await db.prepare('SELECT counter_id FROM counters WHERE counter_id = ?').bind(counter_id).all();
+  const counterResult = await db
+    .prepare('SELECT counter_id FROM counters WHERE counter_id = ?')
+    .bind(counter_id)
+    .all();
   const counterExists = counterResult.results[0];
 
   if (counterExists) {
-    const updateResult = await db.prepare(
-      'UPDATE counters SET count = count + 1 WHERE counter_id = ? RETURNING count'
-    ).bind(counter_id).all();
+    const updateResult = await db
+      .prepare('UPDATE counters SET count = count + 1 WHERE counter_id = ? RETURNING count')
+      .bind(counter_id)
+      .all();
     return updateResult.results[0] || null;
   } else {
-    const insertResult = await db.prepare(
-      'INSERT INTO counters (counter_id, count) VALUES (?, 1) RETURNING count'
-    ).bind(counter_id).all();
+    const insertResult = await db
+      .prepare('INSERT INTO counters (counter_id, count) VALUES (?, 1) RETURNING count')
+      .bind(counter_id)
+      .all();
     return insertResult.results[0] || null;
   }
 }
@@ -258,7 +299,8 @@ export async function storeAsset(platform, asset_id, file) {
       size = excluded.size,
       data = excluded.data
   `;
-  await db.prepare(sql)
+  await db
+    .prepare(sql)
     .bind(asset_id, file.type, new Date().toISOString(), file.size, buffer)
     .run();
 }
@@ -268,11 +310,16 @@ export async function storeAsset(platform, asset_id, file) {
  */
 export async function getAsset(platform, asset_id) {
   const db = getDB(platform);
-  const result = await db.prepare(`
+  const result = await db
+    .prepare(
+      `
     SELECT asset_id, mime_type, updated_at, size, data
     FROM assets
     WHERE asset_id = ?
-  `).bind(asset_id).all();
+  `
+    )
+    .bind(asset_id)
+    .all();
 
   const row = result.results[0];
   if (!row) return null;

@@ -10,10 +10,11 @@
   let fileInput; // for uploading an image
   let progress = undefined; // file upload progress
 
-  $: schema = editorState.schema;
-  $: disabled = !insertImage(editorState, null, editorView);
+  $: schema = editorState?.schema;
+  $: disabled = !editorState || !schema || !insertImage(editorState, null, editorView);
 
   async function uploadImage() {
+    if (disabled || !editorView) return;
     const file = fileInput.files[0];
 
     // We convert all uploads to the WEBP image format
